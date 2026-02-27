@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Study Invaders</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ===== START SCREEN ===== -->
+<div id="screen-menu" class="screen active">
+  <div class="menu-content">
+    <div class="title-block">
+      <div class="title-sub">★ EDUCATIONAL ARCADE ★</div>
+      <h1 class="title-main">STUDY<br>INVADERS</h1>
+      <div class="title-tagline">SHOOT THE CORRECT ANSWER</div>
+    </div>
+    <div class="menu-controls-hint">
+      <span>← →  MOVE</span>
+      <span>SPACE  FIRE</span>
+      <span>ESC  QUIT</span>
+    </div>
+    <div class="menu-buttons">
+      <button id="btn-start" class="btn-primary">▶ START GAME</button>
+      <label class="btn-secondary" id="btn-load-label">
+        📂 LOAD QUESTION SET
+        <input type="file" id="file-input" accept=".json" style="display:none" />
+      </label>
+    </div>
+    <div id="loaded-set-name" class="loaded-label"></div>
+    <div class="menu-footer">Press ENTER to start</div>
+  </div>
+</div>
+
+<!-- ===== GAME SCREEN ===== -->
+<div id="screen-game" class="screen">
+  <div id="game-ui">
+    <div id="ui-left">
+      <span id="ui-score">SCORE: 0</span>
+      <span id="ui-level">LV 1</span>
+    </div>
+    <div id="ui-center">
+      <div id="ui-question-num">Q 1 / 8</div>
+    </div>
+    <div id="ui-right">
+      <span id="ui-lives">♥ ♥ ♥</span>
+    </div>
+  </div>
+  <div id="question-bar">
+    <div id="question-text">Loading...</div>
+  </div>
+  <canvas id="game-canvas"></canvas>
+  <div id="feedback-banner" class="feedback hidden"></div>
+</div>
+
+<!-- ===== GAME OVER SCREEN ===== -->
+<div id="screen-gameover" class="screen">
+  <div class="over-content">
+    <div class="over-title" id="over-title">GAME OVER</div>
+    <div class="over-score">SCORE: <span id="final-score">0</span></div>
+    <div class="over-buttons">
+      <button id="btn-restart" class="btn-primary">↺ PLAY AGAIN</button>
+      <button id="btn-menu" class="btn-secondary">⌂ MAIN MENU</button>
+    </div>
+    <div class="over-hint">ENTER = Play Again</div>
+  </div>
+</div>
+
+<!-- ===== QUIT MODAL ===== -->
+<div id="modal-quit" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="modal-title">QUIT GAME?</div>
+    <div class="modal-sub">Your progress will be lost.</div>
+    <div class="modal-buttons">
+      <button id="btn-confirm-quit" class="btn-danger">✓ CONFIRM</button>
+      <button id="btn-cancel-quit" class="btn-secondary">✕ CANCEL</button>
+    </div>
+    <div class="modal-hint">ENTER = Confirm &nbsp;|&nbsp; ESC = Resume</div>
+  </div>
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>

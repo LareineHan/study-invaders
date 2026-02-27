@@ -1,0 +1,53 @@
+{
+  "title": "Biology 101 Review",
+  "questions": [
+    {
+      "prompt": "What is the main function of mitochondria?",
+      "choices": ["Protein synthesis", "ATP production", "DNA replication", "Cell wall support"],
+      "answerIndex": 1,
+      "explain": "Mitochondria generate ATP via cellular respiration — they're the powerhouse of the cell!"
+    },
+    {
+      "prompt": "Which molecule carries genetic information?",
+      "choices": ["RNA", "ATP", "DNA", "Glucose"],
+      "answerIndex": 2,
+      "explain": "DNA (deoxyribonucleic acid) encodes the genetic blueprint of all living organisms."
+    },
+    {
+      "prompt": "What process do plants use to make food?",
+      "choices": ["Respiration", "Fermentation", "Photosynthesis", "Digestion"],
+      "answerIndex": 2,
+      "explain": "Photosynthesis converts sunlight + CO₂ + water into glucose and oxygen."
+    },
+    {
+      "prompt": "Which organelle is responsible for protein synthesis?",
+      "choices": ["Nucleus", "Ribosome", "Lysosome", "Vacuole"],
+      "answerIndex": 1,
+      "explain": "Ribosomes translate mRNA into proteins — they can be free or attached to the ER."
+    },
+    {
+      "prompt": "What type of bond holds the two DNA strands together?",
+      "choices": ["Covalent", "Ionic", "Hydrogen", "Peptide"],
+      "answerIndex": 2,
+      "explain": "Hydrogen bonds between base pairs (A-T, G-C) hold the double helix together."
+    },
+    {
+      "prompt": "What is the powerhouse of the cell?",
+      "choices": ["Nucleus", "Golgi body", "Mitochondria", "Chloroplast"],
+      "answerIndex": 2,
+      "explain": "Mitochondria produce ATP through cellular respiration — classic biology fact!"
+    },
+    {
+      "prompt": "Which phase of mitosis comes first?",
+      "choices": ["Anaphase", "Metaphase", "Telophase", "Prophase"],
+      "answerIndex": 3,
+      "explain": "Prophase is the first stage — chromosomes condense and the spindle begins to form."
+    },
+    {
+      "prompt": "What is the basic unit of life?",
+      "choices": ["Organ", "Atom", "Cell", "Tissue"],
+      "answerIndex": 2,
+      "explain": "The cell is the fundamental structural and functional unit of all known life."
+    }
+  ]
+}
