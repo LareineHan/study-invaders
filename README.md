@@ -3,46 +3,43 @@
 > **NAU AI Hub — Experimental Learning Project**
 > A retro space shooter where the enemies *are* your study material.
 
-![Game Screenshot](docs/screenshot01.png)
-
 ---
 
 ## What Is This?
 
 Study Invaders is a browser-based **Galaga-style arcade game** built for active recall studying. Instead of passive flashcards, you shoot down the correct answer before the wrong ones reach your ship.
 
-The twist: **question sets are plain JSON files** — which means any student can generate a custom set using AI (ChatGPT, Claude, etc.), drop it into the game, and start shooting.
+The twist: **question sets are plain JSON files** — any student can generate a custom set using AI (ChatGPT, Claude, etc.), drop it into Google Drive, and start shooting.
 
 This project lives in the **NAU AI Hub** as an experiment in:
 - AI-assisted content creation (students generate their own question sets)
-- Community-driven learning (share sets with classmates)
+- Community-driven learning (shared leaderboard across all players)
 - Rapid iteration based on student feedback
 
 ---
 
 ## Quick Start
 
-### Run Locally (GitHub Codespaces or any machine with Node/Python)
+### Run Locally
 
 ```bash
-# Clone the repo
 git clone https://github.com/YOUR_USERNAME/study-invaders.git
 cd study-invaders
 
-# Serve with Python (simplest)
+# Python
 python3 -m http.server 8080
 
-# OR with Node
+# OR Node
 npx serve .
 ```
 
-Then open `http://localhost:8080` in your browser.
+Open `http://localhost:8080`.
 
-### Publish for Free (GitHub Pages)
+### Publish (GitHub Pages)
 
-1. Push all files to a GitHub repo
-2. Go to **Settings → Pages → Source: main / (root)**
-3. Save — your game is live at `https://YOUR_USERNAME.github.io/study-invaders/`
+1. Push to a GitHub repo
+2. **Settings → Pages → Source: main / (root)**
+3. Live at `https://YOUR_USERNAME.github.io/study-invaders/`
 
 ---
 
@@ -50,12 +47,27 @@ Then open `http://localhost:8080` in your browser.
 
 | Key | Action |
 |-----|--------|
-| `← →` | Move ship left / right |
-| `Space` | Fire missile / Skip question card |
-| `Esc` | Open quit menu |
-| `Enter` | Confirm / Start game |
+| `← →` | Move ship |
+| `Space` | Fire / Skip question card |
+| `Esc` | Quit menu |
+| `Enter` | Confirm / Start |
 
-**Goal:** A question appears at the top. Enemy blocks fall — each one shows an answer choice. Shoot the **correct answer** before it reaches the bottom. Wrong shots cost a life. Three lives total.
+A question appears at the top. Enemy blocks fall — each shows an answer choice. Shoot the **correct answer** before it hits the bottom. Wrong shots or misses cost a life. Three lives total.
+
+---
+
+## Game Flow
+
+```
+Start Screen
+  ├── START GAME → Subject Select (Google Drive)
+  │     └── Subject → Level Select → Level 1 → Level 2 → ... → Course Complete!
+  └── 📂 LOAD LOCAL FILE → pick any .json → play immediately
+```
+
+- Enter your name before the first level — stays for the whole session
+- Clear a level → prompted to **Continue** to next level or **Finish**
+- Scores saved to shared leaderboard (Google Sheets)
 
 ---
 
@@ -63,31 +75,57 @@ Then open `http://localhost:8080` in your browser.
 
 ```
 study-invaders/
-├── index.html              # Game UI & screens
-├── style.css               # Retro CRT visual style
-├── game.js                 # All game logic (Canvas, sound, state machine)
-├── README.md               # This file
+├── index.html          # Game UI & screens
+├── style.css           # Retro CRT visual style
+├── game.js             # All game logic
+├── README.md
+├── docs/
+│   ├── naulogo.png     # NAU logo
+│   └── screenshot01.png
 └── questions/
-    ├── sample.json         # Default question set (loads on startup)
-    ├── ds_stack_queue_deque.json
-    ├── discrete_math.json
-    ├── bio182.json
-    ├── algorithms_big_o.json
-    └── general_cs.json
+    └── sample.json     # Fallback question set
 ```
 
 ---
 
-## Creating Your Own Question Set with AI
+## Google Drive — Question Set Management
 
-This is the core experiment. Use any AI assistant to generate a question set for your class.
+Course content lives in a shared Google Drive folder. No code changes needed to add or update questions.
 
-### Prompt Template (copy & paste into Claude or ChatGPT)
+### Folder Structure
+
+```
+Study Invaders/                  ← Root folder
+├── BIO182/
+│   ├── 01_cell_respiration.json
+│   ├── 02_dna_replication.json
+│   └── 03_genetics.json
+├── CS136/
+│   ├── 01_pointers.json
+│   └── 02_memory.json
+└── DISCRETE_MATH/
+    └── 01_logic_sets.json
+```
+
+### Naming Convention
+
+Files must be prefixed with a number to control play order:
+
+```
+01_topic_name.json   →   LEVEL 1 — Topic Name
+02_next_topic.json   →   LEVEL 2 — Next Topic
+```
+
+---
+
+## Creating Question Sets with AI
+
+### Prompt Template
 
 ```
 Create a Study Invaders question set for [YOUR SUBJECT / TOPIC].
 
-Output ONLY a valid JSON file in exactly this format:
+Output ONLY valid JSON in exactly this format:
 
 {
   "title": "Short descriptive title",
@@ -103,53 +141,26 @@ Output ONLY a valid JSON file in exactly this format:
 
 Rules:
 - 10–25 questions
-- 3–4 choices per question (no more than 4)
+- 3–4 choices per question
 - answerIndex is 0-based (0 = first choice)
-- Keep choice text SHORT (under ~40 characters each)
-- explain is optional but strongly encouraged
+- Keep choice text SHORT (under ~40 characters)
 - Focus on commonly confused or tricky concepts
 - Output raw JSON only, no extra text
 ```
 
-**Example prompts that work well:**
-- *"Create a question set for BIO 182 covering cell respiration and DNA replication"*
-- *"Make 15 questions on Stack vs Queue vs Deque data structures — focus on edge cases"*
-- *"Quiz me on Discrete Math: logic, set theory, and modular arithmetic. Emphasize things students confuse"*
+### Adding to Drive
 
-### Load Your Set Into the Game
-
-**Option A — Drag & Drop at Runtime:**
-Click **📂 LOAD QUESTION SET** on the start screen and select your `.json` file. No restart needed.
-
-**Option B — Add to the Repo:**
-Drop your `.json` file into the `questions/` folder and commit. It's now permanently available.
+1. Save AI output as `XX_topic.json` (e.g. `03_genetics.json`)
+2. Drop into the correct subject folder in Google Drive
+3. Appears in game immediately — no code changes needed
 
 ---
 
-## Sharing Question Sets
+## Leaderboard
 
-The goal is a **community-shared library** of question sets.
+Scores are saved automatically to a shared Google Sheets leaderboard after every game. Top 10 displayed on the game over screen.
 
-To share your set with classmates:
-1. Add your `.json` file to `questions/` in the repo
-2. Open a **Pull Request** with a short description (subject, course number, what it covers)
-3. Once merged, everyone playing from the repo gets your questions
-
-**Naming convention:** `SUBJECT_TOPIC.json`
-Examples: `cs249_linked_lists.json`, `bio182_genetics.json`, `mat226_graph_theory.json`
-
----
-
-## Included Question Sets
-
-| File | Subject | Topics | Questions |
-|------|---------|--------|-----------|
-| `sample.json` | BIO 101 | Cell biology basics | 8 |
-| `ds_stack_queue_deque.json` | CS — Data Structures | Stack, Queue, Deque, BFS/DFS | 15 |
-| `discrete_math.json` | MAT — Discrete Math | Logic, sets, proofs, modular arithmetic | 15 |
-| `bio182.json` | BIO 182 | Cell respiration, DNA, genetics, H-W | 15 |
-| `algorithms_big_o.json` | CS — Algorithms | Big-O, sorting, time complexity | 10 |
-| `general_cs.json` | CS — Fundamentals | Pointers, recursion, Git, OOP, SQL | 10 |
+**Weekly reset** — Hub admin deletes rows directly in Google Sheets.
 
 ---
 
@@ -157,7 +168,7 @@ Examples: `cs249_linked_lists.json`, `bio182_genetics.json`, `mat226_graph_theor
 
 ```json
 {
-  "title": "Human-readable title shown in the UI",
+  "title": "Human-readable title",
   "questions": [
     {
       "prompt": "What does LIFO stand for?",
@@ -168,60 +179,48 @@ Examples: `cs249_linked_lists.json`, `bio182_genetics.json`, `mat226_graph_theor
         "Linear Input, First Output"
       ],
       "answerIndex": 0,
-      "explain": "LIFO = Last In First Out. The last item pushed is the first item popped — like a stack of plates."
+      "explain": "LIFO = Last In First Out — like a stack of plates."
     }
   ]
 }
 ```
 
-**Rules:**
 - `choices` → 2–4 items (4 recommended)
-- `answerIndex` → 0-based index into `choices`
-- `explain` → optional, shown after correct answer. Keep it to 1–2 sentences.
-- Keep individual choice text under ~50 characters so it fits in the enemy block
+- `answerIndex` → 0-based index
+- `explain` → optional, shown after correct answer
+- Keep choice text under ~50 characters
 
 ---
 
-## Contributing & Feedback
+## Difficulty Config
 
-This is an **AI Hub experiment** — your feedback directly shapes what gets built next.
-
-**Ways to contribute:**
-- Submit new question sets via Pull Request
-- Open a GitHub Issue with bugs, suggestions, or feature requests
-- Use the game in your study sessions and report what works / what doesn't
-
-**Ideas on the roadmap (based on student feedback):**
-- [ ] Leaderboard / score sharing
-- [ ] Multiple game modes (timed, survival, boss rounds)
-- [ ] In-browser question set editor / AI generator
-- [ ] Mobile touch controls
-- [ ] Multiplayer (same question, race to shoot first)
-
----
-
-## Technical Notes
-
-Built with zero dependencies — plain HTML, CSS, and JavaScript Canvas. No build step, no framework, no npm install required to play. Sound effects are generated entirely with the Web Audio API (no audio files).
-
-To modify difficulty, edit the `CONFIG` object at the top of `game.js`:
+Edit `CONFIG` at the top of `game.js`:
 
 ```js
 const CONFIG = {
   lives: 3,
-  baseEnemySpeed: 55,      // px/sec — increase to make it harder
+  baseEnemySpeed: 55,      // px/sec
   speedScalePerN: 5,       // correct answers per speed increase
-  speedScaleAmount: 0.12,  // 12% faster each level
+  speedScaleAmount: 0.12,  // 12% faster each time
   readDuration: 3.0,       // seconds to read question card
-  feedbackDuration: 1800,  // ms to show correct/wrong feedback
+  feedbackDuration: 1800,  // ms to show feedback
 };
 ```
 
 ---
 
+## Technical Notes
+
+Zero dependencies — plain HTML, CSS, JavaScript Canvas. No build step, no npm install.
+Sound effects generated with Web Audio API (no audio files).
+
+**Backend:** Google Apps Script web app → Google Sheets (leaderboard) + Google Drive (question sets). Static frontend communicates via GET requests to avoid CORS issues.
+
+---
+
 ## License
 
-MIT — free to use, modify, and distribute. If you build something cool with it, share it back with the Hub.
+MIT — free to use, modify, and distribute.
 
 ---
 
