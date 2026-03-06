@@ -592,12 +592,17 @@ async function startSubject(folderId, subjectName) {
     const res = await fetch(SHEETS_URL + '?action=levels&folderId=' + folderId + '&t=' + Date.now());
     levelQueue = await res.json();
     if (!levelQueue.length) { list.innerHTML = '<div class="lb-empty" style="grid-column:1/-1">No levels found.</div>'; return; }
-    list.innerHTML = levelQueue.map((l, i) =>
-      `<button class="subject-btn" data-index="${i}">
-        <span class="subject-name">LEVEL ${i+1}</span>
+    list.innerHTML = levelQueue.map((l, i) => {
+      // "01_cell_division.json" → "Cell Division"
+      const raw = l.name.replace('.json', '');
+      const title = raw.replace(/^\d+_/, '').replace(/_/g, ' ').toUpperCase();
+      const num = raw.match(/^(\d+)/)?.[1] || (i + 1);
+      return `<button class="subject-btn" data-index="${i}">
+        <span class="subject-name">LEVEL ${num}</span>
+        <span style="font-family:'Orbitron',monospace;font-size:0.55rem;color:var(--clr-text);letter-spacing:0.05em;">${title}</span>
         <span class="badge">▶ START</span>
-      </button>`
-    ).join('');
+      </button>`;
+    }).join('');
   list.querySelectorAll('.subject-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       list.querySelectorAll('.subject-btn').forEach(b => b.disabled = true);
