@@ -13,6 +13,7 @@
 <!-- ===== START SCREEN ===== -->
 <div id="screen-menu" class="screen active">
   <div class="menu-content">
+    <div class="nau-badge">⬡ NAU AI HUB</div>
     <div class="title-block">
       <div class="title-sub">★ EDUCATIONAL ARCADE ★</div>
       <h1 class="title-main">STUDY<br>INVADERS</h1>
@@ -26,12 +27,50 @@
     <div class="menu-buttons">
       <button id="btn-start" class="btn-primary">▶ START GAME</button>
       <label class="btn-secondary" id="btn-load-label">
-        📂 LOAD QUESTION SET
+        📂 LOAD LOCAL FILE
         <input type="file" id="file-input" accept=".json" style="display:none" />
       </label>
     </div>
     <div id="loaded-set-name" class="loaded-label"></div>
-    <div class="menu-footer">Press ENTER to start</div>
+    <div class="menu-footer">START GAME or LOAD FROM YOUR LOCAL DEVICE</div>
+  </div>
+</div>
+
+<!-- ===== SUBJECT SELECT SCREEN ===== -->
+<div id="screen-subject" class="screen">
+  <div class="menu-content">
+    <div class="select-screen-title">SELECT SUBJECT</div>
+    <div id="subject-list" class="subject-list">
+      <div class="lb-empty">Loading subjects...</div>
+    </div>
+    <div style="margin-top:1.5rem;">
+      <button id="btn-subject-back" class="btn-secondary">← BACK</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== LEVEL SELECT SCREEN ===== -->
+<div id="screen-level" class="screen">
+  <div class="menu-content">
+    <div class="select-screen-title" id="level-subject-title">SELECT LEVEL</div>
+    <div id="level-list" class="level-list"></div>
+    <div style="margin-top:1.5rem;">
+      <button id="btn-level-back" class="btn-secondary">← BACK</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== USERNAME MODAL ===== -->
+<div id="modal-username" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="modal-title" style="color:var(--clr-primary);">ENTER YOUR NAME</div>
+    <div class="modal-sub">Your score will be saved to the leaderboard.</div>
+    <input id="input-username" class="username-input" type="text"
+           placeholder="YOUR NAME" maxlength="16" autocomplete="off" />
+    <div class="modal-buttons" style="margin-top:1rem;">
+      <button id="btn-username-ok" class="btn-primary">▶ PLAY</button>
+    </div>
+    <div class="modal-hint">ENTER to confirm</div>
   </div>
 </div>
 
@@ -46,6 +85,7 @@
       <div id="ui-question-num">Q 1 / 8</div>
     </div>
     <div id="ui-right">
+      <span id="ui-player-name"></span>
       <span id="ui-lives">♥ ♥ ♥</span>
     </div>
   </div>
@@ -61,6 +101,10 @@
   <div class="over-content">
     <div class="over-title" id="over-title">GAME OVER</div>
     <div class="over-score">SCORE: <span id="final-score">0</span></div>
+    <div class="leaderboard">
+      <div class="lb-title">🏆 LEADERBOARD</div>
+      <div id="lb-list" class="lb-list"></div>
+    </div>
     <div class="over-buttons">
       <button id="btn-restart" class="btn-primary">↺ PLAY AGAIN</button>
       <button id="btn-menu" class="btn-secondary">⌂ MAIN MENU</button>
