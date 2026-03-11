@@ -567,3 +567,20 @@ body {
   color: var(--clr-gold);
   letter-spacing: 0.3em;
 }
+
+/* ===== LOGO BACKGROUND ===== */
+#screen-menu::before,
+#screen-subject::before,
+#screen-level::before,
+#screen-gameover::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url('docs/studyinvaderslogo.png');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 55%;
+  opacity: 0.10;
+  pointer-events: none;
+  z-index: 0;
+}

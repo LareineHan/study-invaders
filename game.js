@@ -346,7 +346,7 @@ function showNextLevelPrompt() {
   overlay.innerHTML = `
     <div style="background:#040d1f;border:2px solid var(--clr-primary);border-radius:12px;padding:2.5rem 3rem;display:flex;flex-direction:column;align-items:center;gap:1.4rem;box-shadow:0 0 40px rgba(0,245,255,0.2);animation:popIn 0.2s ease;">
       <div style="font-family:'Press Start 2P',monospace;font-size:clamp(0.6rem,1.8vw,0.9rem);color:#39ff14;text-shadow:0 0 16px #39ff14;letter-spacing:0.1em;">✅ STAGE CLEAR!</div>
-      <div style="font-family:'Press Start 2P',monospace;font-size:clamp(0.45rem,1.2vw,0.65rem);color:var(--clr-primary);letter-spacing:0.08em;">LEVEL ${levelIndex + 2} IS READY</div>
+      <div style="font-family:'Press Start 2P',monospace;font-size:clamp(0.45rem,1.2vw,0.65rem);color:var(--clr-primary);letter-spacing:0.08em;">NEXT PACK READY</div>
       <div style="font-family:'Orbitron',monospace;font-size:0.9rem;color:var(--clr-text);">Continue to the next level?</div>
       <div style="font-family:'Press Start 2P',monospace;font-size:0.4rem;color:var(--clr-gold);">SCORE: ${score}</div>
       <div style="display:flex;gap:1rem;margin-top:0.3rem;">
@@ -415,11 +415,9 @@ function confirmUsername() {
 // ============================================
 function startGame() {
   if(state===STATE.GAMEOVER&&currentPlayer){actuallyStartGame();return;}
-  if(questions.length===0){loadDefaultQuestions().then(showUsernameModal);return;}
   showUsernameModal();
 }
 function actuallyStartGame() {
-  if(questions.length===0){loadDefaultQuestions().then(actuallyStartGame);return;}
   qIndex=0;score=0;lives=CONFIG.lives;correctCount=0;
   enemySpeed=CONFIG.baseEnemySpeed;missiles=[];inputFrozen=false;fireCooldown=0;
   Sound.start();
@@ -541,7 +539,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
     reader.readAsText(file);
   });
 
-  loadDefaultQuestions();
 });
 
 // ============================================
@@ -564,7 +561,7 @@ async function showSubjectScreen() {
     list.innerHTML = subjects.map(s =>
       `<button class="subject-btn" data-id="${s.id}" data-name="${s.name}">
         <span class="subject-name">${s.name.replace(/_/g,' ')}</span>
-        <span class="badge">${s.levels} LEVEL${s.levels>1?'S':''}</span>
+        <span class="badge">${s.levels} PACK${s.levels>1?'S':''}</span>
       </button>`
     ).join('');
   list.querySelectorAll('.subject-btn').forEach(btn => {
@@ -598,9 +595,8 @@ async function startSubject(folderId, subjectName) {
       const title = raw.replace(/^\d+_/, '').replace(/_/g, ' ').toUpperCase();
       const num = raw.match(/^(\d+)/)?.[1] || (i + 1);
       return `<button class="subject-btn" data-index="${i}">
-        <span class="subject-name">LEVEL ${num}</span>
-        <span style="font-family:'Orbitron',monospace;font-size:0.55rem;color:var(--clr-text);letter-spacing:0.05em;">${title}</span>
-        <span class="badge">▶ START</span>
+          <span class="subject-name">${title}</span>
+          <span class="badge">▶ START</span>
       </button>`;
     }).join('');
   list.querySelectorAll('.subject-btn').forEach(btn => {
@@ -623,7 +619,10 @@ async function loadLevelByIndex(idx, autoAdvance=false) {
     const data = await res.json();
     if (!data.questions || !Array.isArray(data.questions)) throw new Error('bad format');
     questions = data.questions;
-    currentSetName = currentSubjectName + ' — Level ' + (idx + 1);
+    const raw = level.name.replace('.json','');
+    const title = raw.replace(/_/g, ' ');
+currentSetName = currentSubjectName + ' — ' + title;
+    //currentSetName = currentSubjectName + ' — Level ' + (idx + 1);
     if (autoAdvance) {
       // 자동 진행 (Continue 눌렀을 때) → 바로 시작
       actuallyStartGame();
