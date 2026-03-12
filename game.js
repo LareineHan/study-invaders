@@ -19,7 +19,7 @@ const CONFIG = {
   maxMissiles: 5,
   enemyPadding: 60,
   starCount: 120,
-  feedbackDuration: 1800,
+  feedbackDuration: 2500,
   readDuration: 3.0,
 };
 
@@ -241,22 +241,43 @@ function handleHit(choiceIndex) {
     showFeedback(true,q.explain||'');
   } else { Sound.wrong(); loseLife('wrong'); }
 }
+// 변경
 function loseLife(reason) {
   if(inputFrozen)return; lives=Math.max(0,lives-1); updateHUD();
-  if(lives<=0){endGame();return;} Sound.lifeLost();
+  if(lives<=0){
+    // 마지막 목숨 — explain 있으면 보여주고 게임오버
+    if(reason==='wrong'){
+      const explain = questions[qIndex]?.explain || '';
+      showFeedback(false, explain, ()=>endGame());
+    } else {
+      endGame();
+    }
+    return;
+  }
+  Sound.lifeLost();
   if(reason==='wrong') showFeedback(false,'');
   else { inputFrozen=true; setTimeout(()=>{inputFrozen=false;spawnEnemies();},800); }
 }
+// function loseLife(reason) {
+//   if(inputFrozen)return; lives=Math.max(0,lives-1); updateHUD();
+//   if(lives<=0){endGame();return;} Sound.lifeLost();
+//   if(reason==='wrong') showFeedback(false,'');
+//   else { inputFrozen=true; setTimeout(()=>{inputFrozen=false;spawnEnemies();},800); }
+// }
 
 // ============================================
 // FEEDBACK
 // ============================================
-function showFeedback(correct,explain) {
+function showFeedback(correct, explain, onDone=null) {
   inputFrozen=true;
   feedbackBanner.className='feedback '+(correct?'correct':'wrong');
   feedbackBanner.innerHTML=`<span class="fb-icon">${correct?'✅ CORRECT!':'❌ WRONG!'}</span>`+(explain?`<span class="fb-explain">${explain}</span>`:'');
   feedbackBanner.classList.remove('hidden');
-  setTimeout(()=>{ feedbackBanner.classList.add('hidden'); inputFrozen=false; if(correct)advanceQuestion();else spawnEnemies(); },CONFIG.feedbackDuration);
+  setTimeout(()=>{
+    feedbackBanner.classList.add('hidden'); inputFrozen=false;
+    if(onDone) { onDone(); return; }
+    if(correct) advanceQuestion(); else spawnEnemies();
+  }, CONFIG.feedbackDuration);
 }
 
 // ============================================
