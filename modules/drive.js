@@ -31,12 +31,17 @@ export async function showSubjectScreen() {
       return;
     }
 
-    list.innerHTML = subjects.map(s =>
-      `<button class="subject-btn" data-id="${s.id}" data-name="${s.name}">
-        <span class="subject-name">${s.name.replace(/_/g, ' ')}</span>
-        <span class="badge">${s.folders > 0 ? s.folders + ' FOLDER' + (s.folders > 1 ? 'S' : '') : s.levels + ' PACK' + (s.levels > 1 ? 'S' : '')}</span>
-      </button>`
-    ).join('');
+  list.innerHTML = subjects.map(s => {
+    const badge = s.folders > 0 && s.levels === 0
+      ? `${s.folders} FOLDER${s.folders > 1 ? 'S' : ''}`
+      : s.folders > 0
+        ? `${s.folders} FOLDER${s.folders > 1 ? 'S' : ''} + ${s.levels} PACK${s.levels > 1 ? 'S' : ''}`
+        : `${s.levels} PACK${s.levels > 1 ? 'S' : ''}`;
+    return `<button class="subject-btn" data-id="${s.id}" data-name="${s.name}">
+      <span class="subject-name">${s.name.replace(/_/g, ' ')}</span>
+      <span class="badge">${badge}</span>
+    </button>`;
+  }).join('');
 
     list.querySelectorAll('.subject-btn').forEach(btn => {
       btn.addEventListener('click', () => {
