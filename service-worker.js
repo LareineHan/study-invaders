@@ -1,4 +1,4 @@
-const CACHE = 'study-invaders-v1';
+const CACHE = 'study-invaders-v2';
 const ASSETS = [
   '/',
   '/index.html',
