@@ -34,7 +34,7 @@ export async function showSubjectScreen() {
     list.innerHTML = subjects.map(s =>
       `<button class="subject-btn" data-id="${s.id}" data-name="${s.name}">
         <span class="subject-name">${s.name.replace(/_/g, ' ')}</span>
-        <span class="badge">${s.levels} PACK${s.levels > 1 ? 'S' : ''}</span>
+        <span class="badge">${s.folders > 0 ? s.folders + ' FOLDER' + (s.folders > 1 ? 'S' : '') : s.levels + ' PACK' + (s.levels > 1 ? 'S' : '')}</span>
       </button>`
     ).join('');
 
