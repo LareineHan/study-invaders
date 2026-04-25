@@ -478,6 +478,7 @@ document.addEventListener('keyup', e => { keys[e.code] = false; });
 // ── Boot ──
 document.addEventListener('DOMContentLoaded', () => {
   initCanvas();
+  Sound.preloadSfx();
   initTouchControls();
   feedbackBanner = document.getElementById('feedback-banner');
   quitModal      = document.getElementById('modal-quit');

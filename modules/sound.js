@@ -33,21 +33,23 @@ const Sound = (() => {
   let bgmAudio = null;
   let gameoverAudio = null;
   let stageclearAudio = null;
-  
-  function bgmStart() {
-    if (bgmAudio) return;
-    bgmAudio = new Audio('docs/bgm.mp3');
-    bgmAudio.loop = true;
-    bgmAudio.volume = 0.35;
-    bgmAudio.play().catch(() => {});
-    
-    // 첫 인터랙션 때 효과음도 미리 로드
+
+  // 페이지 로드 시 바로 프리로드 (재생은 안 함)
+  function preloadSfx() {
     gameoverAudio = new Audio('docs/gameover.mp3');
     gameoverAudio.volume = 0.8;
     gameoverAudio.load();
     stageclearAudio = new Audio('docs/stageclear.mp3');
     stageclearAudio.volume = 0.8;
     stageclearAudio.load();
+  }
+
+  function bgmStart() {
+    if (bgmAudio) return;
+    bgmAudio = new Audio('docs/bgm.mp3');
+    bgmAudio.loop = true;
+    bgmAudio.volume = 0.35;
+    bgmAudio.play().catch(() => {});
   }
   function bgmStop() {
     if (!bgmAudio) return;
@@ -74,7 +76,7 @@ const Sound = (() => {
     start()      { bgmStart(); [523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone({freq:f,type:'sine',vol:0.25,duration:0.15}),i*80)); },
     bonusHit()   { noise({vol:0.25,duration:0.12}); tone({freq:440,freqEnd:880,type:'sine',vol:0.3,duration:0.15}); setTimeout(()=>tone({freq:660,type:'sine',vol:0.25,duration:0.12}),80); },
     bonusHeart() { [523,784,1047,1319].forEach((f,i)=>setTimeout(()=>tone({freq:f,type:'sine',vol:0.3,duration:0.15}),i*70)); },
-    bgmStart, bgmStop,
+    preloadSfx, bgmStart, bgmStop,
   };
 })();
 
