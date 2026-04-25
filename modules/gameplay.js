@@ -105,7 +105,7 @@ export function spawnEnemies(question, enemySpeed) {
   const count = question.choices.length;
   const pad = canvas.width < 500 ? 10 : CONFIG.enemyPadding;
   const gap = canvas.width < 500 ? 14 : 20;
-  const eW = Math.min(180, (canvas.width - pad * 2) / count - gap), eH = 52, slotW = (canvas.width - pad * 2) / count;
+  const eW = Math.min(180, (canvas.width - pad * 2) / count - gap), eH = 58, slotW = (canvas.width - pad * 2) / count;
   question.choices.forEach((choice, i) => {
     enemies.push({ x: pad + slotW * i + slotW / 2 + (Math.random() - 0.5) * slotW * 0.3, y: -eH - Math.random() * 60 - i * 30, width: eW, height: eH, choiceText: choice, choiceIndex: i, active: true, vy: enemySpeed, shimmer: Math.random() * Math.PI * 2, flashCorrect: false });
   });
@@ -127,8 +127,8 @@ export function drawEnemies() {
     ctx.lineWidth = 1.5; rrect(ctx, e.x - e.width / 2, e.y - e.height / 2, e.width, e.height, 8); ctx.stroke();
     ctx.fillStyle = e.flashCorrect ? '#39ff14' : '#6688cc';
     ctx.font = 'bold 11px Orbitron,monospace'; ctx.textAlign = 'center';
-    ctx.fillText(String.fromCharCode(65 + e.choiceIndex), e.x, e.y - e.height / 2 + 14);
-    ctx.fillStyle = '#ddeeff'; wrapText(ctx, e.choiceText, e.x, e.y + 8, e.width - 16);
+    ctx.fillText(String.fromCharCode(65 + e.choiceIndex), e.x, e.y - e.height / 2 + 12);
+    ctx.fillStyle = '#ddeeff'; wrapText(ctx, e.choiceText, e.x, e.y + 12, e.width - 16);
     ctx.restore();
   });
 }

@@ -250,7 +250,7 @@ body {
   background: rgba(0,5,20,0.95);
   border: 2px solid var(--clr-primary);
   border-radius: 8px;
-  padding: 1rem 2rem;
+  padding: 1.2rem 2.5rem;
   text-align: center;
   z-index: 100;
   pointer-events: none;
@@ -264,7 +264,7 @@ body {
   font-family: var(--font-retro);
   font-size: clamp(1rem, 3vw, 1.5rem);
   display: block;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.6rem;
 }
 #feedback-banner .fb-explain {
   font-family: var(--font-hud);
