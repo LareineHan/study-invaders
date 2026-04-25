@@ -6,6 +6,8 @@ export function resetReview() {
 }
 
 export function recordWrong({ prompt, choices, answerIndex, myChoiceIndex, explain }) {
+  // 같은 문제 중복 방지
+  if (wrongAnswers.some(w => w.prompt === prompt)) return;
   wrongAnswers.push({
     prompt,
     correct: choices[answerIndex],

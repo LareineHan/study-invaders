@@ -2,11 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Study Invaders</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#00f5ff" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Study Invaders" />
+  <link rel="apple-touch-icon" href="docs/studyinvaderslogo.png" />
 </head>
 <body>
 
@@ -23,11 +29,12 @@
       <h1 class="title-main">STUDY<br>INVADERS</h1>
       <div class="title-tagline">SHOOT THE CORRECT ANSWER</div>
     </div>
-    <div class="menu-controls-hint">
-      <span>← →  MOVE</span>
-      <span>SPACE  FIRE</span>
-      <span>ESC  QUIT</span>
-    </div>
+  <div class="menu-controls-hint">
+    <span>< >  = MOVE</span>
+    <span></span>SPACE = FIRE</span>
+    <span></span>ESC = QUIT</span><span></span>
+    <span><span style="font-size:2.7em">🛸</span> × 3 = <span style="font-size:2.7em">♥</span> + 1</span>
+  </div>
     <div class="menu-buttons">
       <button id="btn-start" class="btn-primary">▶ START GAME</button>
       <label class="btn-secondary" id="btn-load-label">
@@ -131,5 +138,10 @@
 </div>
 
 <script type="module" src="game.js"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js');
+  }
+</script>
 </body>
 </html>

@@ -28,16 +28,43 @@ const Sound = (() => {
       src.start();
     } catch(_) {}
   }
+
+  // ── BGM — MP3 파일 기반 ──────────────────────────
+  let bgmAudio = null;
+
+  function bgmStart() {
+    if (bgmAudio) return;
+    bgmAudio = new Audio('docs/bgm.mp3');
+    bgmAudio.loop = true;
+    bgmAudio.volume = 0.25;
+    bgmAudio.play().catch(() => {});
+  }
+  function bgmStop() {
+    if (!bgmAudio) return;
+    bgmAudio.pause();
+    bgmAudio.currentTime = 0;
+    bgmAudio = null;
+  }
+
   return {
-    shoot()   { tone({freq:880,freqEnd:220,type:'square',vol:0.18,duration:0.10}); },
-    tick()    { tone({freq:660,type:'sine',vol:0.12,duration:0.06,attack:0.002}); },
-    correct() { tone({freq:523,type:'sine',vol:0.3,duration:0.12}); setTimeout(()=>tone({freq:659,type:'sine',vol:0.3,duration:0.12}),100); setTimeout(()=>tone({freq:784,type:'sine',vol:0.35,duration:0.2}),200); },
-    wrong()   { noise({vol:0.15,duration:0.08}); tone({freq:200,freqEnd:80,type:'sawtooth',vol:0.25,duration:0.25}); },
-    miss()    { noise({vol:0.2,duration:0.12}); tone({freq:120,type:'sine',vol:0.3,duration:0.3}); },
-    lifeLost(){ [0,130,260].forEach(d=>setTimeout(()=>tone({freq:330,freqEnd:110,type:'square',vol:0.25,duration:0.18}),d)); },
-    gameOver(){ tone({freq:392,freqEnd:49,type:'sawtooth',vol:0.3,duration:0.9}); setTimeout(()=>noise({vol:0.1,duration:0.5}),200); },
-    levelUp() { [523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone({freq:f,type:'square',vol:0.2,duration:0.18}),i*90)); },
-    start()   { [523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone({freq:f,type:'sine',vol:0.25,duration:0.15}),i*80)); },
+    shoot()      { tone({freq:880,freqEnd:220,type:'square',vol:0.18,duration:0.10}); },
+    tick()       { tone({freq:660,type:'sine',vol:0.12,duration:0.06,attack:0.002}); },
+    correct()    { tone({freq:523,type:'sine',vol:0.3,duration:0.12}); setTimeout(()=>tone({freq:659,type:'sine',vol:0.3,duration:0.12}),100); setTimeout(()=>tone({freq:784,type:'sine',vol:0.35,duration:0.2}),200); },
+    wrong()      { noise({vol:0.15,duration:0.08}); tone({freq:200,freqEnd:80,type:'sawtooth',vol:0.25,duration:0.25}); },
+    miss()       { noise({vol:0.2,duration:0.12}); tone({freq:120,type:'sine',vol:0.3,duration:0.3}); },
+    lifeLost()   { [0,130,260].forEach(d=>setTimeout(()=>tone({freq:330,freqEnd:110,type:'square',vol:0.25,duration:0.18}),d)); },
+    gameOver() { bgmStop(); const sfx = new Audio('docs/gameover.mp3'); sfx.volume = 0.8; sfx.play().catch(()=>{}); },
+    stageClear() {
+      bgmStop();
+      const sfx = new Audio('docs/stageclear.mp3');
+      sfx.volume = 0.8;
+      sfx.play().catch(() => {});
+    },
+    levelUp()    { [523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone({freq:f,type:'square',vol:0.2,duration:0.18}),i*90)); },
+    start()      { bgmStart(); [523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone({freq:f,type:'sine',vol:0.25,duration:0.15}),i*80)); },
+    bonusHit()   { noise({vol:0.25,duration:0.12}); tone({freq:440,freqEnd:880,type:'sine',vol:0.3,duration:0.15}); setTimeout(()=>tone({freq:660,type:'sine',vol:0.25,duration:0.12}),80); },
+    bonusHeart() { [523,784,1047,1319].forEach((f,i)=>setTimeout(()=>tone({freq:f,type:'sine',vol:0.3,duration:0.15}),i*70)); },
+    bgmStart, bgmStop,
   };
 })();
 

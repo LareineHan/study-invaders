@@ -1,8 +1,32 @@
 import { CONFIG } from './config.js';
 
-// ── Canvas refs (set by init) ──
+// ── Canvas refs ──
 export let canvas, ctx;
 export let ship = {}, missiles = [], enemies = [], stars = [];
+
+// ── Bonus enemy state ──
+export let bonusEnemies = [];
+let bonusParticles = [];
+let bonusKillCount = 0;         // 현재 세션 보너스 킬 수
+let bonusSpawnTimer = 0;        // 다음 스폰까지 남은 시간
+let bonusSpawnInterval = 0;     // 현재 스폰 인터벌 (랜덤)
+
+const BONUS_KILLS_FOR_HEART = 3;
+const MAX_LIVES = 5;
+const BONUS_SPEED_X = 120;      // 수평 이동 속도
+const BONUS_SPEED_Y = 40;       // 천천히 내려옴
+const BONUS_SIZE = 38;
+
+function randomBonusInterval() {
+  return 8 + Math.random() * 12; // 8~20초 랜덤
+}
+
+export function resetBonusSystem() {
+  bonusEnemies = [];
+  bonusKillCount = 0;
+  bonusSpawnTimer = randomBonusInterval();
+  bonusSpawnInterval = bonusSpawnTimer;
+}
 
 export function initCanvas() {
   canvas = document.getElementById('game-canvas');
@@ -78,8 +102,10 @@ export function drawMissiles() {
 export function spawnEnemies(question, enemySpeed) {
   if (!question) return;
   enemies = [];
-  const count = question.choices.length, pad = CONFIG.enemyPadding;
-  const eW = Math.min(180, (canvas.width - pad * 2) / count - 20), eH = 52, slotW = (canvas.width - pad * 2) / count;
+  const count = question.choices.length;
+  const pad = canvas.width < 500 ? 10 : CONFIG.enemyPadding;
+  const gap = canvas.width < 500 ? 14 : 20;
+  const eW = Math.min(180, (canvas.width - pad * 2) / count - gap), eH = 52, slotW = (canvas.width - pad * 2) / count;
   question.choices.forEach((choice, i) => {
     enemies.push({ x: pad + slotW * i + slotW / 2 + (Math.random() - 0.5) * slotW * 0.3, y: -eH - Math.random() * 60 - i * 30, width: eW, height: eH, choiceText: choice, choiceIndex: i, active: true, vy: enemySpeed, shimmer: Math.random() * Math.PI * 2, flashCorrect: false });
   });
@@ -106,6 +132,166 @@ export function drawEnemies() {
     ctx.restore();
   });
 }
+
+// ── Bonus Enemies ──
+function spawnBonusEnemy() {
+  const fromLeft = Math.random() < 0.5;
+  const s = BONUS_SIZE;
+  bonusEnemies.push({
+    x: fromLeft ? -s : canvas.width + s,
+    y: canvas.height * 0.15 + Math.random() * canvas.height * 0.35,
+    size: s,
+    vx: fromLeft ? BONUS_SPEED_X : -BONUS_SPEED_X,
+    vy: BONUS_SPEED_Y,
+    active: true,
+    shimmer: Math.random() * Math.PI * 2,
+    hp: 1,
+  });
+}
+
+export function updateBonusEnemies(dt, inputFrozen) {
+  if (inputFrozen) {
+    // inputFrozen 중엔 스폰/이동 전부 멈춤, shimmer만 유지
+    bonusEnemies.forEach(b => { if (b.active) b.shimmer += dt * 3; });
+    // 파티클은 계속 업데이트
+    updateBonusParticles(dt);
+    return;
+  }
+
+  // 스폰 타이머
+  bonusSpawnTimer -= dt;
+  if (bonusSpawnTimer <= 0) {
+    spawnBonusEnemy();
+    bonusSpawnTimer = randomBonusInterval();
+  }
+
+  bonusEnemies.forEach(b => {
+    if (!b.active) return;
+    b.x += b.vx * dt;
+    b.y += b.vy * dt;
+    b.shimmer += dt * 3;
+    if (b.x < -100 || b.x > canvas.width + 100 || b.y > canvas.height + 100) {
+      b.active = false;
+    }
+  });
+  bonusEnemies = bonusEnemies.filter(b => b.active);
+  updateBonusParticles(dt);
+}
+
+function updateBonusParticles(dt) {
+  bonusParticles.forEach(p => {
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+    p.life -= dt;
+    p.alpha = Math.max(0, p.life / p.maxLife);
+  });
+  bonusParticles = bonusParticles.filter(p => p.life > 0);
+}
+
+function spawnBonusParticles(x, y) {
+  const colors = ['#ff9500', '#ffcc00', '#ff6a00', '#fff', '#ffaa44'];
+  for (let i = 0; i < 18; i++) {
+    const angle = (Math.PI * 2 * i) / 18 + Math.random() * 0.3;
+    const speed = 80 + Math.random() * 140;
+    bonusParticles.push({
+      x, y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      life: 0.4 + Math.random() * 0.3,
+      maxLife: 0.7,
+      alpha: 1,
+      r: 2 + Math.random() * 3,
+      color: colors[Math.floor(Math.random() * colors.length)],
+    });
+  }
+}
+
+export function drawBonusEnemies() {
+  // 파티클 먼저
+  bonusParticles.forEach(p => {
+    ctx.save();
+    ctx.globalAlpha = p.alpha;
+    ctx.fillStyle = p.color;
+    ctx.shadowColor = p.color;
+    ctx.shadowBlur = 6;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  });
+
+  bonusEnemies.forEach(b => {
+    if (!b.active) return;
+    const { x, y, size: s, shimmer } = b;
+    ctx.save();
+    ctx.shadowColor = '#ff9500';
+    ctx.shadowBlur = 16 * (0.5 + 0.3 * Math.sin(shimmer));
+
+    // 몸통 — UFO 스타일
+    ctx.fillStyle = '#ff6a00';
+    ctx.beginPath();
+    ctx.ellipse(x, y, s * 0.5, s * 0.22, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 돔
+    ctx.fillStyle = '#ffaa44';
+    ctx.beginPath();
+    ctx.ellipse(x, y - s * 0.1, s * 0.25, s * 0.2, 0, Math.PI, Math.PI * 2);
+    ctx.fill();
+
+    // 테두리
+    ctx.strokeStyle = '#ffcc66';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.ellipse(x, y, s * 0.5, s * 0.22, 0, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // ♥ 텍스트 힌트
+    ctx.fillStyle = '#fff';
+    ctx.font = `bold ${Math.floor(s * 0.35)}px Arial`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('♥', x, y + s * 0.05);
+
+    // 진행 표시 (3킬 중 몇 킬)
+    const prog = bonusKillCount % BONUS_KILLS_FOR_HEART;
+    if (prog > 0) {
+      ctx.font = `bold 9px "Press Start 2P",monospace`;
+      ctx.fillStyle = '#ffcc00';
+      ctx.fillText(`${prog}/${BONUS_KILLS_FOR_HEART}`, x, y - s * 0.5);
+    }
+
+    ctx.restore();
+  });
+}
+
+// ── Bonus Collision — returns {hit: bool, heartGained: bool} ──
+export function checkBonusCollisions(currentLives) {
+  let heartGained = false;
+  let hitCount = 0;
+
+  missiles.forEach(m => {
+    if (!m.active) return;
+    bonusEnemies.forEach(b => {
+      if (!b.active) return;
+      const dx = m.x - b.x, dy = m.y - b.y;
+      if (Math.abs(dx) < b.size * 0.5 && Math.abs(dy) < b.size * 0.3) {
+        m.active = false;
+        b.active = false;
+        spawnBonusParticles(b.x, b.y);
+        bonusKillCount++;
+        hitCount++;
+        if (bonusKillCount % BONUS_KILLS_FOR_HEART === 0 && currentLives < MAX_LIVES) {
+          heartGained = true;
+        }
+      }
+    });
+  });
+
+  return { hit: hitCount > 0, heartGained };
+}
+
+export function getBonusKillCount() { return bonusKillCount; }
 
 // ── Collision ──
 export function checkCollisions() {

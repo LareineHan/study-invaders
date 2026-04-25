@@ -18,4 +18,4 @@ export const CONFIG = {
   readDuration: 3.0,
 };
 
-export const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwZsWqqm_fUERO2BfQUSmfaOQfdeRrH7ZOu6EeXgjGBXTMIVm_td3h3GxTPMsHKvOZTHw/exec';
+export const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxltUiskCCzi9CJD6lCWTohWv46Eu8IaOuP2OZbJqnZvjCiQ-qcNaTBtMSeCKW6dv3gvA/exec';
