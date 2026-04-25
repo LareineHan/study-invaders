@@ -306,6 +306,20 @@ function initTouchControls() {
       }
     }
   }, { passive: false });
+
+    // 더블탭 감지
+  let lastTapTime = 0;
+  document.addEventListener('touchend', e => {
+    const now = Date.now();
+    const timeSince = now - lastTapTime;
+    if (timeSince < 300 && timeSince > 0) {
+      // 더블탭
+      if (state === STATE.PLAYING || state === STATE.READING) {
+        openQuitModal();
+      }
+    }
+    lastTapTime = now;
+  }, { passive: true });
 }
 
 function showPullIndicator() {
