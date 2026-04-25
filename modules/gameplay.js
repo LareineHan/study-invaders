@@ -321,7 +321,9 @@ export function updateHUD(score, lives, qIndex, questions, correctCount, current
 // ── Question Card ──
 export function drawQuestionCard(question, qIndex, totalQ, readTimer) {
   const w = Math.min(canvas.width * 0.82, 720), h = Math.min(canvas.height * 0.55, 300);
-  const cx = canvas.width / 2, cy = canvas.height / 2, x = cx - w / 2, y = cy - h / 2;
+  const cx = canvas.width / 2; // 위치
+  const cy = canvas.width < 500 ? canvas.height * 0.38 : canvas.height / 2; // 이것도위치
+  const x = cx - w / 2, y = cy - h / 2; // 이것도 위치
   ctx.save(); ctx.shadowColor = '#00f5ff'; ctx.shadowBlur = 40; ctx.fillStyle = 'rgba(0,15,40,0.97)'; rrect(ctx, x, y, w, h, 16); ctx.fill();
   ctx.shadowBlur = 0; ctx.strokeStyle = '#00f5ff'; ctx.lineWidth = 2; rrect(ctx, x, y, w, h, 16); ctx.stroke(); ctx.restore();
   ctx.save(); ctx.font = 'bold 11px "Press Start 2P",monospace'; ctx.fillStyle = '#00f5ff'; ctx.textAlign = 'center';

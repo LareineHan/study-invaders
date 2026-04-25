@@ -31,13 +31,23 @@ const Sound = (() => {
 
   // ── BGM — MP3 파일 기반 ──────────────────────────
   let bgmAudio = null;
-
+  let gameoverAudio = null;
+  let stageclearAudio = null;
+  
   function bgmStart() {
     if (bgmAudio) return;
     bgmAudio = new Audio('docs/bgm.mp3');
     bgmAudio.loop = true;
-    bgmAudio.volume = 0.25;
+    bgmAudio.volume = 0.35;
     bgmAudio.play().catch(() => {});
+    
+    // 첫 인터랙션 때 효과음도 미리 로드
+    gameoverAudio = new Audio('docs/gameover.mp3');
+    gameoverAudio.volume = 0.8;
+    gameoverAudio.load();
+    stageclearAudio = new Audio('docs/stageclear.mp3');
+    stageclearAudio.volume = 0.8;
+    stageclearAudio.load();
   }
   function bgmStop() {
     if (!bgmAudio) return;
