@@ -76,11 +76,14 @@ export async function showFolderScreen(folderId, folderName) {
 
     // ── 서브폴더 버튼 ──
     const folderBtns = folders.map(f => `
-      <button class="subject-btn folder-btn" data-id="${f.id}" data-name="${f.name}">
+      <button class="subject-btn folder-btn" data-id="${f.id}" data-name="${f.name}"
+        style="width:min(680px,90vw);flex-direction:row;justify-content:space-between;">
         <span class="subject-name">📁 ${f.name.replace(/_/g, ' ')}</span>
         <span class="badge">FOLDER ›</span>
       </button>`
     ).join('');
+
+
 
     // ── 파일 체크박스 카드 ──
     const fileBtns = files.length ? `
