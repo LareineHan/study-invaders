@@ -84,7 +84,6 @@ export async function showFolderScreen(folderId, folderName) {
 
     // ── 파일 체크박스 카드 ──
     const fileBtns = files.length ? `
-      <div style="grid-column:1/-1;width:100%;display:flex;flex-direction:column;gap:0.5rem;align-items:center;margin:0 auto;">
         ${files.map((f, i) => {
           const title = f.name.replace('.json','').replace(/^\d+_/,'').replace(/_/g,' ').toUpperCase();
           return `
@@ -124,10 +123,13 @@ export async function showFolderScreen(folderId, folderName) {
             padding:0.5rem 1rem;border-radius:4px;cursor:pointer;
             opacity:0.3;pointer-events:none;transition:opacity 0.15s;
           ">▶ PLAY SELECTED (<span id="selected-count">0</span>)</button>
-        </div>
-      </div>` : '';
+  ` : '';
 
-    list.innerHTML = `${folderBtns}${fileBtns}`;
+    list.innerHTML = `
+      <div style="grid-column:1/-1;width:100%;display:flex;flex-direction:column;align-items:center;gap:0.6rem;">
+        ${folderBtns}
+        ${fileBtns}
+      </div>`;
 
     // 체크박스 상태 업데이트
     function updatePlayBtn() {
