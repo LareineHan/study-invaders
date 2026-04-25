@@ -1,7 +1,8 @@
 # 🚀 Study Invaders
 
-> **NAU AI Hub — Experimental Learning Project**
 > A retro space shooter where the enemies *are* your study material.
+
+**[Created by Lareine Han](https://www.linkedin.com/in/lareinehan/)** · Featured by NAU AI Hub
 
 ---
 
@@ -11,48 +12,20 @@ Study Invaders is a browser-based **Galaga-style arcade game** built for active 
 
 The twist: **question sets are plain JSON files** — any student can generate a custom set using AI (ChatGPT, Claude, etc.), drop it into Google Drive, and start shooting.
 
-This project lives in the **NAU AI Hub** as an experiment in:
-- AI-assisted content creation (students generate their own question sets)
-- Community-driven learning (shared leaderboard across all players)
-- Rapid iteration based on student feedback
-
----
-
-## Quick Start
-
-### Run Locally
-
-```bash
-git clone https://github.com/YOUR_USERNAME/study-invaders.git
-cd study-invaders
-
-# Python
-python3 -m http.server 8080
-
-# OR Node
-npx serve .
-```
-
-Open `http://localhost:8080`.
-
-### Publish (GitHub Pages)
-
-1. Push to a GitHub repo
-2. **Settings → Pages → Source: main / (root)**
-3. Live at `https://YOUR_USERNAME.github.io/study-invaders/`
-
 ---
 
 ## How to Play
 
-| Key | Action |
-|-----|--------|
-| `← →` | Move ship |
+| Input | Action |
+|-------|--------|
+| `← →` or drag (mobile) | Move ship |
 | `Space` | Fire / Skip question card |
+| Swipe down + release (mobile) | Slingshot fire |
 | `Esc` | Quit menu |
-| `Enter` | Confirm / Start |
 
-A question appears at the top. Enemy blocks fall — each shows an answer choice. Shoot the **correct answer** before it hits the bottom. Wrong shots or misses cost a life. Three lives total.
+A question appears at the top. Enemy blocks fall — each shows an answer choice. Shoot the **correct answer** before it hits the bottom. Wrong shots or misses cost a life.
+
+**Bonus:** Shoot 3 UFOs → earn an extra life (max 5 lives).
 
 ---
 
@@ -61,13 +34,17 @@ A question appears at the top. Enemy blocks fall — each shows an answer choice
 ```
 Start Screen
   ├── START GAME → Subject Select (Google Drive)
-  │     └── Subject → Level Select → Level 1 → Level 2 → ... → Course Complete!
+  │     └── Subject → Pack Select
+  │           ├── ▶ PLAY (single pack)
+  │           ├── ☑ Select multiple → PLAY SELECTED
+  │           └── 📁 Subfolder → browse deeper
   └── 📂 LOAD LOCAL FILE → pick any .json → play immediately
-```
 
-- Enter your name before the first level — stays for the whole session
-- Clear a level → prompted to **Continue** to next level or **Finish**
-- Scores saved to shared leaderboard (Google Sheets)
+After each pack:
+  ├── 📋 REVIEW mistakes
+  ├── ▶ CONTINUE → next pack
+  └── ✕ FINISH → leaderboard
+```
 
 ---
 
@@ -75,46 +52,58 @@ Start Screen
 
 ```
 study-invaders/
-├── index.html          # Game UI & screens
-├── style.css           # Retro CRT visual style
-├── game.js             # All game logic
+├── index.html              # Game UI & screens
+├── style.css               # Retro CRT visual style
+├── game.js                 # Main orchestrator
+├── manifest.json           # PWA manifest
+├── service-worker.js       # PWA offline cache
 ├── README.md
 ├── docs/
-│   ├── naulogo.png     # NAU logo
+│   ├── bgm.mp3             # Background music
+│   ├── gameover.mp3        # Game over sound
+│   ├── stageclear.mp3      # Stage clear sound
+│   ├── icon.png            # App icon
+│   ├── naulogo.png         # NAU logo
+│   ├── studyinvaderslogo.png
 │   └── screenshot01.png
+├── modules/
+│   ├── config.js           # STATE, CONFIG constants
+│   ├── sound.js            # Sound engine + BGM
+│   ├── leaderboard.js      # Google Sheets leaderboard
+│   ├── review.js           # Wrong answer review
+│   ├── drive.js            # Google Drive integration
+│   └── gameplay.js         # Ship, enemies, canvas, HUD
 └── questions/
-    └── sample.json     # Fallback question set
+    └── sample.json         # Fallback question set
 ```
 
 ---
 
-## Google Drive — Question Set Management
+## Google Drive — Question Pack Management
 
-Course content lives in a shared Google Drive folder. No code changes needed to add or update questions.
+Course content lives in a shared Google Drive folder. No code changes needed to add or update packs.
 
 ### Folder Structure
 
 ```
-Study Invaders/                  ← Root folder
+Study Invaders/          ← Root folder (set ROOT_FOLDER in Apps Script)
 ├── BIO182/
-│   ├── 01_cell_respiration.json
-│   ├── 02_dna_replication.json
-│   └── 03_genetics.json
-├── CS136/
-│   ├── 01_pointers.json
-│   └── 02_memory.json
-└── DISCRETE_MATH/
-    └── 01_logic_sets.json
+│   ├── cell_respiration.json
+│   └── genetics.json
+├── CS249/
+│   ├── sorting.json
+│   └── Search Algorithms/   ← Subfolder supported
+│       └── binary_search.json
+└── MAT226/
+    └── logic_sets.json
 ```
 
-### Naming Convention
+### Pack Selection UI
 
-Files must be prefixed with a number to control play order:
-
-```
-01_topic_name.json   →   LEVEL 1 — Topic Name
-02_next_topic.json   →   LEVEL 2 — Next Topic
-```
+- Each folder shows its packs as a checklist
+- Select individual packs or **SELECT ALL → PLAY SELECTED**
+- Subfolders are browsable (📁)
+- **PLAY ALL** plays every pack in the folder in order
 
 ---
 
@@ -140,81 +129,71 @@ Output ONLY valid JSON in exactly this format:
 }
 
 Rules:
-- 10–25 questions
+- 10–20 questions
 - 3–4 choices per question
-- answerIndex is 0-based (0 = first choice)
-- Keep choice text SHORT (under ~40 characters)
-- Focus on commonly confused or tricky concepts
-- Output raw JSON only, no extra text
+- answerIndex is 0-based
+- Keep choice text SHORT (under ~30 characters)
+- Output raw JSON only
 ```
 
-### Adding to Drive
+---
 
-1. Save AI output as `XX_topic.json` (e.g. `03_genetics.json`)
-2. Drop into the correct subject folder in Google Drive
-3. Appears in game immediately — no code changes needed
+## Backend Setup
+
+**Google Apps Script** acts as the API between the game and Google services.
+
+| Action | What it does |
+|--------|-------------|
+| `subjects` | Lists course folders |
+| `folder` | Lists subfolders + files in a folder |
+| `file` | Returns JSON contents of a pack |
+| `submit` | Saves a score to Google Sheets |
+| `leaderboard` | Returns top 10 scores |
+
+See `study_invaders_backend_docs.docx` for full setup instructions.
+
+---
+
+## PWA — Install as App
+
+Study Invaders is a Progressive Web App. On mobile:
+
+1. Open in Safari / Chrome
+2. Tap **Share → Add to Home Screen**
+3. Launches fullscreen like a native app
 
 ---
 
 ## Leaderboard
 
-Scores are saved automatically to a shared Google Sheets leaderboard after every game. Top 10 displayed on the game over screen.
-
-**Weekly reset** — Hub admin deletes rows directly in Google Sheets.
-
----
-
-## Question Set Format Reference
-
-```json
-{
-  "title": "Human-readable title",
-  "questions": [
-    {
-      "prompt": "What does LIFO stand for?",
-      "choices": [
-        "Last In, First Out",
-        "Last In, First Over",
-        "List In, Function Out",
-        "Linear Input, First Output"
-      ],
-      "answerIndex": 0,
-      "explain": "LIFO = Last In First Out — like a stack of plates."
-    }
-  ]
-}
-```
-
-- `choices` → 2–4 items (4 recommended)
-- `answerIndex` → 0-based index
-- `explain` → optional, shown after correct answer
-- Keep choice text under ~50 characters
+Scores saved automatically after each game to Google Sheets. Top 10 shown on the game over screen. Reset by deleting rows directly in Sheets.
 
 ---
 
 ## Difficulty Config
 
-Edit `CONFIG` at the top of `game.js`:
+Edit `CONFIG` in `modules/config.js`:
 
 ```js
 const CONFIG = {
   lives: 3,
-  baseEnemySpeed: 55,      // px/sec
-  speedScalePerN: 5,       // correct answers per speed increase
-  speedScaleAmount: 0.12,  // 12% faster each time
-  readDuration: 3.0,       // seconds to read question card
-  feedbackDuration: 1800,  // ms to show feedback
+  baseEnemySpeed: 55,
+  speedScalePerN: 5,
+  speedScaleAmount: 0.12,
+  readDuration: 3.0,
+  feedbackDuration: 2500,
 };
 ```
 
 ---
 
-## Technical Notes
+## Tech Stack
 
-Zero dependencies — plain HTML, CSS, JavaScript Canvas. No build step, no npm install.
-Sound effects generated with Web Audio API (no audio files).
+Zero dependencies — plain HTML, CSS, Canvas API, Web Audio API.
+No build step. No npm install. No framework.
 
-**Backend:** Google Apps Script web app → Google Sheets (leaderboard) + Google Drive (question sets). Static frontend communicates via GET requests to avoid CORS issues.
+**Backend:** Google Apps Script → Google Sheets + Google Drive.
+All communication via GET requests (no CORS issues).
 
 ---
 
@@ -224,4 +203,10 @@ MIT — free to use, modify, and distribute.
 
 ---
 
-*Built by Lareine Han · NAU AI Hub*
+<div align="center">
+
+**[Created by Lareine Han](https://www.linkedin.com/in/lareinehan/)**
+
+*Featured by NAU AI Hub · Northern Arizona University*
+
+</div>

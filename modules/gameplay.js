@@ -128,7 +128,7 @@ export function drawEnemies() {
     ctx.fillStyle = e.flashCorrect ? '#39ff14' : '#6688cc';
     ctx.font = 'bold 11px Orbitron,monospace'; ctx.textAlign = 'center';
     ctx.fillText(String.fromCharCode(65 + e.choiceIndex), e.x, e.y - e.height / 2 + 14);
-    ctx.fillStyle = '#ddeeff'; wrapText(ctx, e.choiceText, e.x, e.y, e.width - 16);
+    ctx.fillStyle = '#ddeeff'; wrapText(ctx, e.choiceText, e.x, e.y + 8, e.width - 16);
     ctx.restore();
   });
 }
