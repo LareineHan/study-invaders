@@ -58,6 +58,20 @@ const Sound = (() => {
     bgmAudio = null;
   }
 
+  function unlockSfx()
+  {
+    //ios 에서 audio context 언락하기 - 무음으로 0.001초 재생
+    [gameoverAudio, stageclearAudio].forEach(a => {
+      if(!a) return;
+      a.volume = 0;
+      a.play().then(()=> {
+        a.pause();
+        a.currentTime = 0;
+        a.volume = 0.8;
+      }).catch(()=>{});
+    });
+  }
+
   return {
     shoot()      { tone({freq:880,freqEnd:220,type:'square',vol:0.18,duration:0.10}); },
     tick()       { tone({freq:660,type:'sine',vol:0.12,duration:0.06,attack:0.002}); },
@@ -76,7 +90,7 @@ const Sound = (() => {
     start()      { bgmStart(); [523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone({freq:f,type:'sine',vol:0.25,duration:0.15}),i*80)); },
     bonusHit()   { noise({vol:0.25,duration:0.12}); tone({freq:440,freqEnd:880,type:'sine',vol:0.3,duration:0.15}); setTimeout(()=>tone({freq:660,type:'sine',vol:0.25,duration:0.12}),80); },
     bonusHeart() { [523,784,1047,1319].forEach((f,i)=>setTimeout(()=>tone({freq:f,type:'sine',vol:0.3,duration:0.15}),i*70)); },
-    preloadSfx, bgmStart, bgmStop,
+    unlockSfx, preloadSfx, bgmStart, bgmStop,
   };
 })();
 
