@@ -34,7 +34,6 @@ const Sound = (() => {
   let gameoverAudio = null;
   let stageclearAudio = null;
 
-  // 페이지 로드 시 바로 프리로드 (재생은 안 함)
   function preloadSfx() {
     gameoverAudio = new Audio('docs/gameover.mp3');
     gameoverAudio.volume = 0.8;
@@ -42,6 +41,22 @@ const Sound = (() => {
     stageclearAudio = new Audio('docs/stageclear.mp3');
     stageclearAudio.volume = 0.8;
     stageclearAudio.load();
+  }
+
+  function unlockSfx() {
+    // iOS에서 첫 터치 때 무음 재생으로 언락
+    [gameoverAudio, stageclearAudio].forEach(a => {
+      if (!a) return;
+      const prevVol = a.volume;
+      a.volume = 0;
+      a.play().then(() => {
+        a.pause();
+        a.currentTime = 0;
+        a.volume = prevVol;
+      }).catch(() => {});
+    });
+    // AudioContext도 같이 언락
+    getCtx();
   }
 
   function bgmStart() {
@@ -58,20 +73,6 @@ const Sound = (() => {
     bgmAudio = null;
   }
 
-  function unlockSfx()
-  {
-    //ios 에서 audio context 언락하기 - 무음으로 0.001초 재생
-    [gameoverAudio, stageclearAudio].forEach(a => {
-      if(!a) return;
-      a.volume = 0;
-      a.play().then(()=> {
-        a.pause();
-        a.currentTime = 0;
-        a.volume = 0.8;
-      }).catch(()=>{});
-    });
-  }
-
   return {
     shoot()      { tone({freq:880,freqEnd:220,type:'square',vol:0.18,duration:0.10}); },
     tick()       { tone({freq:660,type:'sine',vol:0.12,duration:0.06,attack:0.002}); },
@@ -79,12 +80,21 @@ const Sound = (() => {
     wrong()      { noise({vol:0.15,duration:0.08}); tone({freq:200,freqEnd:80,type:'sawtooth',vol:0.25,duration:0.25}); },
     miss()       { noise({vol:0.2,duration:0.12}); tone({freq:120,type:'sine',vol:0.3,duration:0.3}); },
     lifeLost()   { [0,130,260].forEach(d=>setTimeout(()=>tone({freq:330,freqEnd:110,type:'square',vol:0.25,duration:0.18}),d)); },
-    gameOver() { bgmStop(); const sfx = new Audio('docs/gameover.mp3'); sfx.volume = 0.8; sfx.play().catch(()=>{}); },
+    gameOver() {
+      bgmStop();
+      if (gameoverAudio) {
+        gameoverAudio.currentTime = 0;
+        gameoverAudio.volume = 0.8;
+        gameoverAudio.play().catch(() => {});
+      }
+    },
     stageClear() {
       bgmStop();
-      const sfx = new Audio('docs/stageclear.mp3');
-      sfx.volume = 0.8;
-      sfx.play().catch(() => {});
+      if (stageclearAudio) {
+        stageclearAudio.currentTime = 0;
+        stageclearAudio.volume = 0.8;
+        stageclearAudio.play().catch(() => {});
+      }
     },
     levelUp()    { [523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone({freq:f,type:'square',vol:0.2,duration:0.18}),i*90)); },
     start()      { bgmStart(); [523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone({freq:f,type:'sine',vol:0.25,duration:0.15}),i*80)); },
