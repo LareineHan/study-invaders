@@ -84,7 +84,7 @@ const Sound = (() => {
       bgmStop();
       if (gameoverAudio) {
         gameoverAudio.currentTime = 0;
-        gameoverAudio.volume = 0.8;
+        gameoverAudio.volume = 0.5;
         gameoverAudio.play().catch(() => {});
       }
     },
@@ -92,7 +92,7 @@ const Sound = (() => {
       bgmStop();
       if (stageclearAudio) {
         stageclearAudio.currentTime = 0;
-        stageclearAudio.volume = 0.8;
+        stageclearAudio.volume = 0.5;
         stageclearAudio.play().catch(() => {});
       }
     },
