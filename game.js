@@ -254,12 +254,9 @@ function initTouchControls() {
   const cvs = document.getElementById('game-canvas');
   if (!cvs) return;
   // 첫 터치시 효과음 언락
-  let sfxUnlocked = false;
   document.addEventListener('touchstart', () => {
-    if (sftUnlocked) return;
-    sfxUnlocked = true;
     Sound.unlockSfx();
-  }, {once: true}); 
+  }, { once: true });
 
   cvs.addEventListener('touchstart', e => {
     e.preventDefault();
