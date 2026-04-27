@@ -36,10 +36,10 @@ const Sound = (() => {
 
   function preloadSfx() {
     gameoverAudio = new Audio('docs/gameover.mp3');
-    gameoverAudio.volume = 0.8;
+    gameoverAudio.volume = 0.5;
     gameoverAudio.load();
     stageclearAudio = new Audio('docs/stageclear.mp3');
-    stageclearAudio.volume = 0.8;
+    stageclearAudio.volume = 0.5;
     stageclearAudio.load();
   }
 
@@ -84,7 +84,7 @@ const Sound = (() => {
       bgmStop();
       if (gameoverAudio) {
         gameoverAudio.currentTime = 0;
-        gameoverAudio.volume = 0.5;
+        gameoverAudio.volume = 0.45;
         gameoverAudio.play().catch(() => {});
       }
     },
